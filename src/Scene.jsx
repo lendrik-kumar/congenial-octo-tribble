@@ -9,6 +9,7 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 
 import { Map } from "./components/Map";
 import { CharacterController } from "./components/CharacterController";
+import { Portal } from "./components/Portal";
 
 function BloomEffect() {
   const { gl, scene, camera, size } = useThree();
@@ -85,6 +86,10 @@ export default function Scene() {
             position={[0, -1, -6]}
           />
           <CharacterController />
+          {/* Portal model positioned at specified coordinates */}
+          <Portal position={[1, -1, -5.41]} />
+          <Portal position={[9, -1, -2]} />
+          <Portal position={[-7, -1, -2]} />
         </Physics>
 
         <BloomEffect />
