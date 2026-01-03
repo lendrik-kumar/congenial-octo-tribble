@@ -2,9 +2,12 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { PointerLockControls, useGLTF } from '@react-three/drei';
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
 function NeonStage() {
-  const { scene } = useGLTF('../neon_stage2.glb');
+  const { scene } = useGLTF('../neon_stage_full2.glb');
 
   return (
     <primitive
@@ -99,17 +102,71 @@ function PlayerControls() {
   return null;
 }
 
+function BloomEffect() {
+  const { gl, scene, camera, size } = useThree();
+  const composerRef = useRef<EffectComposer | null>(null);
+
+  useEffect(() => {
+    const composer = new EffectComposer(gl);
+    composerRef.current = composer;
+
+    composer.setSize(size.width, size.height);
+    composer.addPass(new RenderPass(scene, camera));
+
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(size.width, size.height),
+      2,
+      3,
+      0.2
+    );
+    composer.addPass(bloomPass);
+
+    const handleResize = () => {
+      composer.setSize(window.innerWidth, window.innerHeight);
+    };
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      composer.dispose();
+    };
+  }, [gl, scene, camera, size]);
+
+  useFrame(() => {
+    if (composerRef.current) {
+      composerRef.current.render();
+    }
+  }, 1);
+
+  return null;
+}
+
 export const Scene: React.FC = () => (
   <Canvas
     shadows
     camera={{ position: [0, 0, 0], fov: 60 }}
+    dpr={[1, 2]}
+    gl={{ antialias: false }}
+    
   >
-    <color attach="background" args={['#7a067e']} />
-
-    <ambientLight intensity={1} color="#f400e8" />
+    <ambientLight intensity={5} color="#f400e8" />
     <directionalLight
-      position={[8, 15, 10]}
-      intensity={2}
+      position={[0, 500, 1000]}
+      intensity={1}
+      castShadow
+      shadow-mapSize-width={4096}
+      shadow-mapSize-height={4096}
+    />
+    <directionalLight
+      position={[90, 20, 10]}
+      intensity={0.4}
+      castShadow
+      shadow-mapSize-width={2048}
+      shadow-mapSize-height={2048}
+    />
+    <directionalLight
+      position={[-45, -20, 10]}
+      intensity={0.4}
       castShadow
       shadow-mapSize-width={2048}
       shadow-mapSize-height={2048}
@@ -119,5 +176,6 @@ export const Scene: React.FC = () => (
 
     <PointerLockControls />
     <PlayerControls />
+    <BloomEffect />
   </Canvas>
 );
