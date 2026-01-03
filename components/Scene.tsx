@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
 function NeonStage() {
-  const { scene } = useGLTF('../neon_stage.glb');
+  const { scene } = useGLTF('../neon_stage2.glb');
 
   return (
     <primitive
@@ -106,10 +106,10 @@ export const Scene: React.FC = () => (
   >
     <color attach="background" args={['#7a067e']} />
 
-    <ambientLight intensity={0.5} color="#f400e8" />
+    <ambientLight intensity={1} color="#f400e8" />
     <directionalLight
       position={[8, 15, 10]}
-      intensity={1}
+      intensity={2}
       castShadow
       shadow-mapSize-width={2048}
       shadow-mapSize-height={2048}
