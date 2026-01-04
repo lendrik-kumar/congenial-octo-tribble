@@ -4,6 +4,7 @@ Command: npx gltfjsx@6.2.3 public/models/character.glb -o src/components/Charact
 */
 
 import { useAnimations, useGLTF } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
 
@@ -12,22 +13,91 @@ export function Character({ animation, ...props }) {
   const { nodes, materials, animations, scene } = useGLTF(
     "/models/character.glb"
   );
-  console.log(
-    "Available animations:",
-    animations.map((a) => a.name)
-  );
-  const { actions } = useAnimations(animations, group);
+  
+  const { actions, mixer } = useAnimations(animations, group);
+  const previousAction = useRef(null);
+  
+  // Log available animations
   useEffect(() => {
-    const act = actions?.[animation];
-    console.log(
-      "Trying to play animation:",
-      animation,
-      "Action exists:",
-      !!act
-    );
-    if (!act) return;
-    act.reset().fadeIn(0.24).play();
-    return () => act.fadeOut?.(0.24);
+    if (animations.length > 0) {
+      console.log("Available animations:", animations.map((a) => a.name));
+    }
+  }, [animations]);
+
+  // Update animation mixer on each frame
+  useFrame((state, delta) => {
+    if (mixer) {
+      mixer.update(delta);
+    }
+  });
+
+  // Handle animation playback
+  useEffect(() => {
+    if (!actions || !animation) return;
+
+    // Find animation with case-insensitive matching
+    let action = actions[animation];
+    
+    // Try exact match first
+    if (!action) {
+      // Try case-insensitive match
+      const actionKey = Object.keys(actions).find(
+        (key) => key.toLowerCase() === animation.toLowerCase()
+      );
+      if (actionKey) {
+        action = actions[actionKey];
+      }
+    }
+    
+    // Try common variations if still not found
+    if (!action) {
+      const variations = [
+        animation.toLowerCase(),
+        animation.charAt(0).toUpperCase() + animation.slice(1).toLowerCase(),
+        animation.toUpperCase(),
+      ];
+      for (const variant of variations) {
+        if (actions[variant]) {
+          action = actions[variant];
+          break;
+        }
+      }
+    }
+
+    if (action) {
+      // Fade out previous action
+      if (previousAction.current && previousAction.current !== action) {
+        previousAction.current.fadeOut(0.2);
+      }
+      
+      // Play new action
+      action
+        .reset()
+        .fadeIn(0.2)
+        .setLoop(THREE.LoopRepeat)
+        .play();
+      
+      previousAction.current = action;
+      console.log("Playing animation:", animation, "->", action.getClip().name);
+    } else {
+      console.warn(`Animation "${animation}" not found. Available:`, Object.keys(actions));
+      // Try to play the first available animation as fallback
+      const firstAction = Object.values(actions).find(a => a);
+      if (firstAction && firstAction !== previousAction.current) {
+        if (previousAction.current) {
+          previousAction.current.fadeOut(0.2);
+        }
+        firstAction.reset().fadeIn(0.2).setLoop(THREE.LoopRepeat).play();
+        previousAction.current = firstAction;
+        console.log("Playing fallback animation:", firstAction.getClip().name);
+      }
+    }
+
+    return () => {
+      if (action) {
+        action.fadeOut(0.2);
+      }
+    };
   }, [actions, animation]);
   return (
     <group ref={group} {...props} dispose={null}>
