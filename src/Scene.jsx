@@ -75,29 +75,45 @@ const keyboardMap = [
 
 
 function SceneContent({ onReady }) {
-  const { gl, scene, camera } = useThree();
-  const warmedUp = useRef(false);
+  // const { gl, scene, camera } = useThree();
+  // const warmedUp = useRef(false);
+  
 
-  useEffect(() => {
-    let frames = 0;
+  // useEffect(() => {
+  //   let frames = 0;
 
-    const warmup = () => {
-      frames++;
+  //   const warmup = () => {
+  //     frames++;
 
-      gl.compile(scene, camera);
+  //     gl.compile(scene, camera);
 
-      if (frames > 120) { 
-        if (!warmedUp.current) {
-          warmedUp.current = true;
-          onReady();
-        }
-        return;
-      }
-      requestAnimationFrame(warmup);
-    };
+  //     if (frames > 120) { 
+  //       if (!warmedUp.current) {
+  //         warmedUp.current = true;
+  //         onReady();
+  //       }
+  //       return;
+  //     }
+  //     requestAnimationFrame(warmup);
+  //   };
 
-    warmup();
-  }, [gl, scene, camera, onReady]);
+  //   warmup();
+  // }, [gl, scene, camera, onReady]);
+  const frames = useRef(0);
+  const readyOnce = useRef(false);
+
+  useFrame(() => {
+    if (readyOnce.current) return;
+
+    frames.current++;
+
+    // 60–90 frames is usually enough for:
+    // shaders, skeletons, textures, bloom, physics
+    if (frames.current > 90) {
+      readyOnce.current = true;
+      onReady();
+    }
+  });
 
   return (
     <>
