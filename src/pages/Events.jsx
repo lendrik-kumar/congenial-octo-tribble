@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { TopNavOverlay } from "../components/TopNavOverlay";
+import { events } from "../utils/EventsData.js";
+import { upcomingEvents } from "../utils/EventsData.js";
+import Footer from "../components/footer";
 
 function Aura({ aura_file_name, size, children }) {
   return <div
@@ -15,29 +18,6 @@ function Aura({ aura_file_name, size, children }) {
     {children}
   </div>
 }
-
-const events = [
-  {
-    title: "Hack TU",
-    below_title: "Flagship Hackathon",
-    description: "Lorem ipsum kuch bhi likh do bhai mei nahi soch skta Lorem ipsum kuch bhi likh do bhai mei nahi soch skta Lorem ipsum kuch bhi likh do soch skta"
-  },
-  {
-    title: "Hack TU 2",
-    below_title: "Flagship Hackathon",
-    description: "Lorem ipsum kuch bhi likh do bhai mei nahi soch skta Lorem ipsum kuch bhi likh do bhai mei nahi soch skta Lorem ipsum kuch bhi likh do soch skta"
-  },
-  {
-    title: "Hack TU 3",
-    below_title: "Flagship Hackathon",
-    description: "Lorem ipsum kuch bhi likh do bhai mei nahi soch skta Lorem ipsum kuch bhi likh do bhai mei nahi soch skta Lorem ipsum kuch bhi likh do soch skta"
-  },
-  {
-    title: "Hack TU 4",
-    below_title: "Flagship Hackathon",
-    description: "Lorem ipsum kuch bhi likh do bhai mei nahi soch skta Lorem ipsum kuch bhi likh do bhai mei nahi soch skta Lorem ipsum kuch bhi likh do soch skta"
-  }
-]
 
 function rotate(new_value, total) {
   if (new_value < 0) return total + new_value;
@@ -81,24 +61,6 @@ function Event({ event }) {
   </div>
 }
 
-const upcomingEvents = [
-  {
-    title: "Event X",
-    liner: "One liner jo bhi event hai"
-  },
-  {
-    title: "Event X",
-    liner: "One liner jo bhi event hai"
-  },
-  {
-    title: "Event X",
-    liner: "One liner jo bhi event hai"
-  },
-  {
-    title: "Event X",
-    liner: "One liner jo bhi event hai"
-  },
-]
 const radius = "20vw"
 function UpcomingEvents() {
   return <div className="flex flex-col pb-128" style={{
@@ -165,6 +127,7 @@ export function Events() {
         <div></div>
       </div>
       <UpcomingEvents />
+      <Footer />
     </div>
   );
 }
