@@ -6,6 +6,7 @@ import { Physics } from "@react-three/rapier";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
+import { useProgress } from "@react-three/drei";
 
 import { NeonGridFloor } from "./components/NeonGridFloor";
 import { Map } from "./components/Map";
@@ -77,6 +78,12 @@ const keyboardMap = [
 function SceneContent({ onReady }) {
   // const { gl, scene, camera } = useThree();
   // const warmedUp = useRef(false);
+
+  const {progress} = useProgress();
+
+  useEffect(() => {
+    console.log("Loading progress:", progress);
+  }, [progress]);
   
 
   // useEffect(() => {
@@ -106,10 +113,11 @@ function SceneContent({ onReady }) {
     if (readyOnce.current) return;
 
     frames.current++;
+    console.log(frames)
 
     // 60–90 frames is usually enough for:
     // shaders, skeletons, textures, bloom, physics
-    if (frames.current > 90) {
+    if (frames.current > 150) {
       readyOnce.current = true;
       onReady();
     }
@@ -136,7 +144,7 @@ function SceneContent({ onReady }) {
         </Suspense>
 
         <Suspense fallback={null}>
-          <CharacterController />
+          {/* <CharacterController /> */}
 
           <Portal position={[0, -1, -1]} portalColorStart="red" lampColor="#b20024">
             <TiLogo scale={0.4} position={[0, 0.5, 0]} rotation={[0, -3, 0]} />
